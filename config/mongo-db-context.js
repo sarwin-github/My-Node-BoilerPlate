@@ -4,12 +4,12 @@ const mongoStore = require('connect-mongo')(session);
 
 // Local connection
 let mongoConnectionLocal = {	
-	'url': `mongodb://${process.env.MongoDBLocalUser}:${process.env.MongoDBLocalPassword}@127.0.0.1:27017/entrenami-db-dev`
+	'url': `mongodb://${process.env.MongoDBLocalUser}:${process.env.MongoDBLocalPassword}@127.0.0.1:27017/my-database`
 };
 
 // Development database from mongolab
 let mongoConnectionOnline = {
-	'url': `mongodb://${process.env.MLabDBUser}:${process.env.MLabDBPassword}@ds113749.mlab.com:13749/entrenami-db-dev`
+	'url': `mongodb://${process.env.MLabDBUser}:${process.env.MLabDBPassword}@ds113749.mlab.com:13749/my-database`
 };
 
 
