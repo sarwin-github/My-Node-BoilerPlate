@@ -15,12 +15,19 @@ const helmet         = require('helmet');
 const dotEnv         = require('dotenv').config();
 const favicon        = require('serve-favicon');
 
+// Local modules for config
+const localVariables = require('./config/initialize-local-variables');
+const cors           = require('./config/initialize-cors');
+const csurf          = require('./config/initialize-csurf');
+const routes         = require('./config/routes-initialization');
+const errorHandler   = require('./config/error-handler');
+const databaseConfig = require('./config/mongo-db-context');
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set database connection
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const databaseConfig = require('./config/mongo-db-context');
 const env = process.env.NODE_EN || 'local';
-console.log(`NODE_EN: ${env}`);
+console.log(`NODE_ENV: ${env}`);
 databaseConfig.pickEnv(env, app);
 		
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -62,20 +69,31 @@ app.use('/css/'   , express.static(__dirname + '/node_modules/font-awesome/css')
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set locals variable
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const localVariables = require('./config/initialize-local-variables');
 app.use((req, res, next) => localVariables.initializeVariable(req, res, next));
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Set up CORS
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/* Allow CORS
+*/
+cors.initializeCORS(app);
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Anti csurf attack protection
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/* uncomment if you want to add csurf protection, 
+   csurf will be stored in cookies and local variable 
+ */
+csurf.initializeCSURF(app);
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set and Initialize Routes
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const setRoutes = require('./config/routes-initialization');
-setRoutes.initializeRoutes(app);
+routes.initializeRoutes(app);
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set Error Handler
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-let errorHandler = require('./config/error-handler');
-
 app.use((req, res, next) => errorHandler.getError(req, res, next));
 app.use((err, req, res, next) => errorHandler.showError(err, req, res, next));
 

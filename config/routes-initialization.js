@@ -8,5 +8,5 @@ const HomeRoutes = require('../app/home/route/home-routes');
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 module.exports.initializeRoutes = app => {
 	/* Home routes */
-	app.use('/', HomeRoutes);
+	app.use('/api', HomeRoutes);
 };

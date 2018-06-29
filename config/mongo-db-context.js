@@ -4,12 +4,12 @@ const mongoStore = require('connect-mongo')(session);
 
 // Local connection
 let mongoConnectionLocal = {	
-	'url': `mongodb://${process.env.MongoDBLocalUser}:${process.env.MongoDBLocalPassword}@127.0.0.1:27017/my-database`
+	'url': `mongodb://127.0.0.1:27017/my-database`
 };
 
 // Development database from mongolab
 let mongoConnectionOnline = {
-	'url': `mongodb://${process.env.MLabDBUser}:${process.env.MLabDBPassword}@ds113749.mlab.com:13749/my-database`
+	'url': `online database connection here`
 };
 
 
@@ -25,8 +25,14 @@ module.exports.pickEnv = (env, app) => {
 	        	err => { if(err) { console.log(err); }}); 
 	        break;
 		case 'local':
+			let options = {
+			  auth: {authdb: 'admin'},
+			  user: process.env.MongoDBLocalUser,
+			  pass: process.env.MongoDBLocalPassword,
+			}
+
 	    	app.set('port', process.env.PORT || 9001);
-	        mongoose.connect(mongoConnectionLocal.url, {auth:{authdb:"admin"}},  
+	        mongoose.connect(mongoConnectionLocal.url, options,  
 	        	err => { if(err) { console.log(err); }});
 			break;
 	};
