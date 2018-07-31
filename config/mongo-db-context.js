@@ -1,14 +1,16 @@
-const session    = require('express-session');
-const mongoose   = require('mongoose');
-const mongoStore = require('connect-mongo')(session);
+import session      from 'express-session';
+import mongoose     from 'mongoose';
+import connectMongo from 'connect-mongo';
+
+const mongoStore = connectMongo(session);
 
 // Local connection
-let mongoConnectionLocal = {	
+const mongoConnectionLocal = {	
 	'url': `mongodb://127.0.0.1:27017/my-database`
 };
 
 // Development database from mongolab
-let mongoConnectionOnline = {
+const mongoConnectionOnline = {
 	'url': `online database connection here`
 };
 
@@ -16,11 +18,11 @@ let mongoConnectionOnline = {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Session storage and database configuration 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-module.exports.pickEnv = (env, app) => {
+const databaseConfig = (env, app) => {
 	mongoose.Promise = global.Promise;
 	switch (env) {
 	    case 'dev':
-	    	app.set('port', process.env.PORT || 9001);
+	    	app.set('port', process.env.PORT || 9003);
 	        mongoose.connect(mongoConnectionOnline.url, 
 	        	err => { if(err) { console.log(err); }}); 
 	        break;
@@ -31,7 +33,7 @@ module.exports.pickEnv = (env, app) => {
 			  pass: process.env.MongoDBLocalPassword,
 			}
 
-	    	app.set('port', process.env.PORT || 9001);
+	    	app.set('port', process.env.PORT || 9003);
 	        mongoose.connect(mongoConnectionLocal.url, options,  
 	        	err => { if(err) { console.log(err); }});
 			break;
@@ -47,4 +49,6 @@ module.exports.pickEnv = (env, app) => {
 		cookie : { maxAge: 60 * 60 * 1000}
 	}));
 };
+
+export default databaseConfig;
 

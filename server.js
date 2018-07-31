@@ -1,34 +1,33 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Add the required modules
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const express        = require('express');
-const app            = express();
-const http           = require('http').Server(app);
-const session        = require('express-session');
-const validator      = require('express-validator');
-const bodyParser     = require('body-parser');
-const cookieParser   = require('cookie-parser');
-const flash          = require('connect-flash');
-const morgan         = require('morgan');
-const methodOverride = require('method-override');
-const helmet         = require('helmet');
-const dotEnv         = require('dotenv').config();
-const favicon        = require('serve-favicon');
+import express        from 'express';
+import session        from 'express-session';
+import validator      from 'express-validator';
+import bodyParser     from 'body-parser';
+import cookieParser   from 'cookie-parser';
+import flash          from 'connect-flash';
+import morgan         from 'morgan' ;
+import methodOverride from 'method-override';
+import helmet         from 'helmet';
+import dotEnv         from 'dotenv';
+import favicon        from 'serve-favicon';
 
 // Local modules for config
-const localVariables = require('./config/initialize-local-variables');
-const cors           = require('./config/initialize-cors');
-const csurf          = require('./config/initialize-csurf');
-const routes         = require('./config/routes-initialization');
-const errorHandler   = require('./config/error-handler');
-const databaseConfig = require('./config/mongo-db-context');
+import errorHandler       from './config/error-handler';
+import initializeCors     from './config/initialize-cors';
+import initializeCSURF    from './config/initialize-csurf';
+import initializeVariable from './config/initialize-local-variables';
+import initializeRoutes   from './config/routes-initialization';
+import databaseConfig     from './config/mongo-db-context';
 
+const app = express();
+dotEnv.config();
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set database connection
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const env = process.env.NODE_EN || 'local';
-console.log(`NODE_ENV: ${env}`);
-databaseConfig.pickEnv(env, app);
+databaseConfig(env, app);
 		
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set view engine and session
@@ -69,27 +68,25 @@ app.use('/css/'   , express.static(__dirname + '/node_modules/font-awesome/css')
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set locals variable
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-app.use((req, res, next) => localVariables.initializeVariable(req, res, next));
+app.use((req, res, next) => initializeVariable(req, res, next));
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set up CORS
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-/* Allow CORS
-*/
-cors.initializeCORS(app);
+/* Allow CORS*/
+initializeCors(app);
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Anti csurf attack protection
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /* uncomment if you want to add csurf protection, 
-   csurf will be stored in cookies and local variable 
- */
-csurf.initializeCSURF(app);
+   csurf will be stored in cookies and local variable */
+initializeCSURF(app);
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set and Initialize Routes
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-routes.initializeRoutes(app);
+initializeRoutes(app);
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set Error Handler
@@ -100,6 +97,7 @@ app.use((err, req, res, next) => errorHandler.showError(err, req, res, next));
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Create Server
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-http.listen(app.get('port'), () => {
+app.listen(app.get('port'), () => {
+	console.log(`NODE_ENV: ${env}`);
 	console.log(`Server Listening to Port: ${app.get('port')}`);
 });

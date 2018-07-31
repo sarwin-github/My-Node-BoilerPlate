@@ -1,11 +1,13 @@
-const csurf = require('csurf');
+import csurf from 'csurf';
 
-module.exports.initializeCSURF = (app) => {
+const initializeCSURF = (app) => {
 	app.use(csurf());
 
 	app.use(function(req, res, next) {
 		res.cookie('XSRF-TOKEN', req.csrfToken());
 	  	res.locals._csrf = req.csrfToken();
-	 	next();
+	 	return next();
 	}); 
 }
+
+export default initializeCSURF;

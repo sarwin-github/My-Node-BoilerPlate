@@ -7,3 +7,10 @@ module.exports.getHome = (req, res) => {
 		message: "Successfully fetched the home page"
 	});
 };
+
+module.exports.getAbout = (req, res) => {
+	res.status(200).json({
+		success: true,
+		message: "Successfully fetched the about page"
+	})
+}

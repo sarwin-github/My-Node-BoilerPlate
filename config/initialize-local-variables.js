@@ -1,7 +1,9 @@
-module.exports.initializeVariable = (req, res, next) => {
+const initializeVariable = (req, res, next) => {
   	res.locals.session = req.session;
   	res.locals.title   = "Website Title";
 	res.locals.node_environment   = process.env.NODE_EN;
 
-	next();
+	return next();
 };
+
+export default initializeVariable;
